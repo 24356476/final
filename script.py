@@ -39,7 +39,7 @@ python train_generator.py --cuda True --name "train_generator" --keep_step 2500 
 python train_generator.py --cuda True --name "train_generator" --keep_step 5000 --decay_step 5000 --save_count 500 --tensorboard_count 100 --batch_size 1 --workers 4 --gpu_ids 0 --tocg_checkpoint checkpoints/test/tocg_final.pth --occlusion --gen_checkpoint checkpoints/train_generator/gen_model_final.pth --dis_checkpoint checkpoints/train_generator/dis_model_final.pth --load_step 5000 --shuffle
 
 
-python train_generator.py --cuda True --name "train_generator" --lambda_vgg 25 --keep_step 7500 --decay_step 7500 --save_count 500 --tensorboard_count 100 --batch_size 1 --workers 4 --gpu_ids 0 --tocg_checkpoint checkpoints/test/tocg_final.pth --occlusion --gen_checkpoint checkpoints/train_generator/gen_model_final.pth --dis_checkpoint checkpoints/train_generator/dis_model_final.pth --load_step 10000 --shuffle
+python train_generator.py --cuda True --name "train_generator" --lambda_vgg 25 --keep_step 7500 --decay_step 7500 --save_count 500 --tensorboard_count 100 --batch_size 1 --workers 4 --gpu_ids 0 --tocg_checkpoint checkpoints/test/tocg_final.pth --occlusion --gen_checkpoint checkpoints/train_generator/gen_model_final.pth --dis_checkpoint checkpoints/train_generator/dis_model_final.pth --load_step 10000 #--shuffle
 
 python train_generator.py --cuda True --name "train_generator" --lambda_vgg 20 --keep_step 10000 --decay_step 10000 --save_count 500 --tensorboard_count 100 --batch_size 1 --workers 4 --gpu_ids 0 --tocg_checkpoint checkpoints/test/tocg_final.pth --occlusion --gen_checkpoint checkpoints/train_generator/gen_model_final.pth --dis_checkpoint checkpoints/train_generator/dis_model_final.pth --load_step 15000 #--shuffle
 
@@ -67,7 +67,12 @@ tensorboard --logdir=tensorboard --host=127.0.0.1 --port=6006
 
 #python test_generator.py --cuda True --gpu_ids 0 --batch-size 1 --tocg_checkpoint ./eval_models/weights/v0.1/tocg_final.pth --gen_checkpoint ./eval_models/weights/v0.1/gen.pth --test_name "test_run" --shuffle
 
-python test_generator.py --cuda True --gpu_ids 0 --batch-size 1 --gen_checkpoint ./eval_models/weights/v0.1/gen_model_final.pth --tocg_checkpoint ./eval_models/weights/v0.1/tocg_final.pth --test_name "test_run" --shuffle
+python test_generator.py --cuda True --gpu_ids 0 --batch-size 1 --gen_checkpoint ./eval_models/weights/v0.1/gen_model_final.pth --tocg_checkpoint ./eval_models/weights/v0.1/tocg_final.pth --test_name "test_run"
+
+python test_generator.py --cuda True --gpu_ids 0 --shuffle --batch-size 1 --gen_checkpoint ./eval_models/weights/v0.1/gen_model_final.pth --tocg_checkpoint ./eval_models/weights/v0.1/tocg_final.pth --test_name "test_run"
+
+
+
 
 #with pretrained condition generator
 #python test_generator.py --cuda True --gpu_ids 0 --batch-size 1 --gen_checkpoint ./eval_models/weights/v0.1/gen.pth --test_name "test_run" --shuffle

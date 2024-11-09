@@ -425,13 +425,32 @@ def save_checkpoint(model, save_path, opt):
         model.cuda()
 
 
+#def load_checkpoint(model, checkpoint_path, opt):
+#    if not os.path.exists(checkpoint_path):
+#        print('no checkpoint')
+#        raise
+#    log = model.load_state_dict(torch.load(checkpoint_path), strict=False)
+#    if opt.cuda:
+#        model.cuda()
+
 def load_checkpoint(model, checkpoint_path, opt):
     if not os.path.exists(checkpoint_path):
-        print('no checkpoint')
-        raise
-    log = model.load_state_dict(torch.load(checkpoint_path), strict=False)
-    if opt.cuda:
-        model.cuda()
+        print('No checkpoint found at:', checkpoint_path)
+        raise FileNotFoundError(f"No checkpoint found at {checkpoint_path}")
+
+    try:
+        # Load the checkpoint and print its contents for debugging
+        print(f"Attempting to load checkpoint from: {checkpoint_path}")
+        checkpoint_data = torch.load(checkpoint_path, map_location='cpu')  # map_location='cpu' for safe loading
+        print("Checkpoint keys:", checkpoint_data.keys())
+
+        log = model.load_state_dict(checkpoint_data, strict=False)
+        if opt.cuda:
+            model.cuda()
+    except Exception as e:
+        print(f"Failed to load checkpoint at {checkpoint_path}: {e}")
+        return False
+    return True
 
 
 def weights_init(m):

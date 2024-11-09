@@ -88,7 +88,7 @@ class CPDataset(data.Dataset):
 
         #r = int(length_a / 25) + 1
         #r = int(length_a / 16) + 1
-        r_neck = int(length_a / 25) + 1  # Adjust this divisor for the neck
+        r_neck = int(length_a / 30) + 1  # Adjust this divisor for the neck
         r_torso = int(length_a / 50) + 1  # Adjust this divisor specifically for the torso
         r_arms = int(length_a / 25) + 1  # Adjust this for the arms if needed
 

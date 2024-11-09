@@ -1,6 +1,7 @@
 import os
 from PIL import Image
 from PIL import Image, ImageDraw
+from torchvision.transforms import ToPILImage
 import torch
 from torch.utils.data import Dataset
 from torchvision.utils import save_image
@@ -15,6 +16,7 @@ class SinglePairDataset(Dataset):
     def __init__(self, model_image_path, cloth_image_path, opt):
         super(SinglePairDataset, self).__init__()
         self.opt = opt
+        self.opt.data_root = ""
         self.fine_height = opt.fine_height
         self.fine_width = opt.fine_width
         self.semantic_nc = opt.semantic_nc
@@ -141,6 +143,11 @@ class SinglePairDataset(Dataset):
         return agnostic
 
     def __getitem__(self, index):
+        # Debugging inputs
+        print(f"Processing index: {index}")
+        print(f"Model image path: {self.model_image_path}")
+        print(f"Cloth image path: {self.cloth_image_path}")
+
         # Model Image
         im_pil_big = Image.open(self.model_image_path).convert('RGB')
         im_pil = transforms.Resize((self.fine_height, self.fine_width), interpolation=Image.BICUBIC)(im_pil_big)
@@ -231,6 +238,20 @@ class SinglePairDataset(Dataset):
         agnostic = transforms.Resize((self.fine_height, self.fine_width), interpolation=Image.NEAREST)(agnostic)
         agnostic = self.transform(agnostic)
 
+        # Add logs to check input image loading
+        print(f"Processing index: {index}")
+        print(f"Model image path: {self.model_image_path}")
+        print(f"Cloth image path: {self.cloth_image_path}")
+
+        # Check intermediate outputs
+        print("Generated agnostic:")
+        print(f"Agnostic shape: {agnostic.shape if agnostic is not None else 'None'}")
+        print("Other outputs:")
+        print(f"Cloth shape: {c.shape if c is not None else 'None'}")
+
+
+
+
         # Final result dictionary
         result = {
             'cloth': c,
@@ -243,14 +264,26 @@ class SinglePairDataset(Dataset):
             'pcm': new_parse_map[3:4],
             'parse_cloth': im * new_parse_map[3:4] + (1 - new_parse_map[3:4]),
             'image': im,
-            'agnostic': agnostic
+            'agnostic': agnostic,
+            'output_image': self.generate_output_image(im_pil, c)
         }
+
+        # Debug final result
+        print("Final result from SinglePairDataset:")
+        for key, value in result.items():
+            if isinstance(value, dict):
+                for subkey, subvalue in value.items():
+                    print(f"{key}[{subkey}]: {subvalue.shape if isinstance(subvalue, torch.Tensor) else subvalue}")
+            else:
+                print(f"{key}: {value.shape if isinstance(value, torch.Tensor) else value}")
+
+        return result
 
         #return result
         # At the end of __getitem__, after processing
-        output_path = os.path.join(self.opt.output_dir, f"output_{index}.png")
-        save_image(result['parse_cloth'], output_path)  # Save the generated image
-        result['output_path'] = output_path  # Add the path to result
+        #output_path = os.path.join(self.opt.output_dir, f"output_{index}.png")
+        #save_image(result['parse_cloth'], output_path)  # Save the generated image
+        #result['output_path'] = output_path  # Add the path to result
 
     def name(self):
         return "SinglePairDataset"
@@ -258,3 +291,30 @@ class SinglePairDataset(Dataset):
     def __len__(self):
         # Only one pair, so the dataset length is 1
         return 1
+
+    from torchvision.transforms import ToPILImage
+
+    from torchvision.transforms import ToPILImage
+
+    def generate_output_image(self, model_image, cloth_image_tensor):
+        """
+        Generate the virtual try-on output image by combining the model and cloth images.
+
+        Args:
+            model_image (PIL.Image.Image): The model image (already a PIL image).
+            cloth_image_tensor (torch.Tensor): The cloth image (Tensor format).
+
+        Returns:
+            PIL.Image: The generated output image.
+        """
+        # Convert cloth tensor to PIL image
+        to_pil = transforms.ToPILImage()
+        cloth_image = to_pil(cloth_image_tensor)
+
+        # Blend the two images (example logic; replace with your actual generation logic)
+        combined_image = Image.blend(model_image, cloth_image, alpha=0.5)
+
+        return combined_image
+
+
+
